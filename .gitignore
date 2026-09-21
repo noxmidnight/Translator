@@ -1,0 +1,9 @@
+config.ini
+__pycache__/
+*.pyc
+.venv/
+build/
+*.gguf
+.cursor/
+/tmp/
+*.log

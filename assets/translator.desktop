@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Translator
+GenericName=Arabic ↔ English Translator
+Comment=Local Arabic ↔ English translator (ALLaM) — closes model server when quit
+Exec=/home/nox/Code/Translator/scripts/desktop-launch.sh
+Icon=/home/nox/Code/Translator/assets/translator.png
+Path=/home/nox/Code/Translator
+Terminal=false
+Categories=Office;Education;Utility;
+Keywords=translate;arabic;english;allam;llama;
+StartupNotify=true
+StartupWMClass=translator
+# Single main window; launcher stops llama-server on exit to free RAM.
+X-GNOME-UsesNotifications=true

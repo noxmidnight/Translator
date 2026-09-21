@@ -1,0 +1,18 @@
+[server]
+host = 127.0.0.1
+port = 8080
+
+[model]
+# Download: https://huggingface.co/Omartificial-Intelligence-Space/ALLaM-7B-Instruct-preview-Q4_K_M-GGUF
+path = /home/nox/models/allam-7b-instruct-preview-q4_k_m.gguf
+name = allam-7b-instruct
+ctx_size = 2048
+gpu_layers = 99
+
+[generation]
+temperature = 0.3
+max_tokens = 768
+
+[paths]
+lexicon = data/muse_ar_en.txt
+theme_css = assets/theme.css

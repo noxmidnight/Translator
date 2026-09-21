@@ -1,0 +1,135 @@
+/* Matte black + antique gold outline theme for Translator */
+window, window.background {
+  background-color: #0d0d0d;
+  color: #e6e2d8;
+}
+
+.translator-root {
+  background-color: #0d0d0d;
+  color: #e6e2d8;
+  padding: 4px;
+}
+
+.label-title {
+  color: #b5a88c;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.label-section {
+  color: #b5a88c;
+  font-weight: 600;
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+
+.label-muted {
+  color: #9a917c;
+  font-size: 12px;
+}
+
+.gold-frame {
+  background-color: #161616;
+  border: 1px solid #6e6452;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 2px 0;
+}
+
+.gold-frame scrolledwindow,
+.gold-frame textview,
+.gold-frame treeview {
+  background-color: #161616;
+  color: #e6e2d8;
+  border-radius: 4px;
+}
+
+textview {
+  background-color: #161616;
+  color: #e6e2d8;
+  padding: 10px;
+  font-size: 13px;
+}
+
+textview text {
+  background-color: #161616;
+  color: #e6e2d8;
+}
+
+treeview {
+  background-color: #161616;
+  color: #e6e2d8;
+  border-radius: 4px;
+}
+
+treeview header button {
+  background-color: #1a1a1a;
+  color: #b5a88c;
+  border: none;
+  border-bottom: 1px solid #6e6452;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+
+treeview:selected {
+  background-color: #242018;
+  color: #ebe4d4;
+}
+
+combobox, combobox button, combobox entry {
+  background-color: #161616;
+  color: #e6e2d8;
+  border: 1px solid #6e6452;
+  border-radius: 4px;
+  padding: 4px 8px;
+  min-height: 28px;
+}
+
+combobox window.popup {
+  background-color: #161616;
+  color: #e6e2d8;
+  border: 1px solid #6e6452;
+}
+
+button {
+  background-image: none;
+  background-color: #1a1a1a;
+  color: #e6e2d8;
+  border: 1px solid #5e5648;
+  border-radius: 4px;
+  padding: 8px 16px;
+  min-height: 32px;
+}
+
+button:hover {
+  background-color: #201c14;
+  border-color: #b5a88c;
+  color: #f0eadc;
+}
+
+button.primary-run {
+  background-color: #1a1710;
+  border: 1px solid #b5a88c;
+  color: #b5a88c;
+  font-weight: bold;
+  padding: 8px 22px;
+}
+
+button.primary-run:hover {
+  background-color: #242018;
+  color: #d0c6b0;
+}
+
+button:disabled {
+  opacity: 0.45;
+}
+
+.label-full-translation {
+  color: #e6e2d8;
+  background-color: #161616;
+  border: 1px solid #5e5648;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
