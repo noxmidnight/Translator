@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+from translator import __version__
 from translator.config import load_settings
 from translator.lexicon import Lexicon, default_lexicon_path
 from translator.llama_client import LlamaClient
@@ -42,6 +43,7 @@ def main(argv: list[str] | None = None) -> int:
         choices=["translate", "explain", "both", "transliterate", "word-by-word"],
         default="translate",
     )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     args = parser.parse_args(argv)
 
     text = args.text
@@ -69,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
 
     mode = _parse_mode(args.mode)
     lexicon = Lexicon()
-    lexicon.load(default_lexicon_path())
+    lexicon.load(default_lexicon_path(settings.lexicon_path))
     rag = ""
     if mode in (Mode.WORD_BY_WORD, Mode.EXPLAIN, Mode.TRANSLATE, Mode.BOTH):
         rag = lexicon.build_rag_context(text)

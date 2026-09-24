@@ -12,13 +12,17 @@ namespace {
 
 size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
   auto* out = static_cast<std::string*>(userdata);
-  out->append(ptr, size * nmemb);
-  return size * nmemb;
+  const size_t n = size * nmemb;
+  if (out->capacity() < out->size() + n) {
+    out->reserve(out->size() + n + 4096);
+  }
+  out->append(ptr, n);
+  return n;
 }
 
 std::string json_escape(const std::string& s) {
   std::string out;
-  out.reserve(s.size() + 8);
+  out.reserve(s.size() + s.size() / 4 + 8);
   for (unsigned char c : s) {
     switch (c) {
       case '"':
@@ -119,6 +123,7 @@ std::string extract_content(const std::string& json) {
   if (pos >= json.size() || json[pos] != '"') return {};
   ++pos;
   std::string out;
+  out.reserve(std::min(json.size() - pos, size_t{4096}));
   while (pos < json.size()) {
     char c = json[pos++];
     if (c == '\\' && pos < json.size()) {

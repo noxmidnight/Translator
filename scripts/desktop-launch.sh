@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Desktop launcher: start llama-server + GTK GUI; always free RAM on exit.
-# Closing the GUI stops llama-server on the configured port (and any server
-# this script started), so Jetson unified memory is released.
+# Closing the GUI stops llama-server on the configured port so Jetson memory is released.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONFIG="${TRANSLATOR_CONFIG:-$ROOT/config.ini}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+source "$SCRIPT_DIR/lib.sh"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOG="${TRANSLATOR_SERVER_LOG:-/tmp/translator-llama-server.log}"
 PIDFILE="${TRANSLATOR_PIDFILE:-/tmp/translator-desktop.pids}"
 SERVER_PID=""
-STARTED_SERVER=0
 
 notify() {
   local summary="$1" body="${2:-}"
@@ -19,41 +19,17 @@ notify() {
   echo "$summary ${body}" >&2
 }
 
-if [[ ! -f "$CONFIG" ]]; then
-  if [[ -f "$ROOT/config.ini.example" ]]; then
-    cp "$ROOT/config.ini.example" "$ROOT/config.ini"
-    CONFIG="$ROOT/config.ini"
-  else
-    notify "Translator" "Missing config.ini"
-    exit 1
-  fi
-fi
+ensure_config "$ROOT" || { notify "Translator" "Missing config.ini"; exit 1; }
 
-get_ini() {
-  local section="$1" key="$2" default="${3:-}"
-  awk -F'=' -v s="[$section]" -v k="$key" -v d="$default" '
-    $0 ~ /^\[/ { insec = ($0 == s) }
-    insec && $1 ~ "^[[:space:]]*"k"[[:space:]]*$" {
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2; found=1; exit
-    }
-    END { if (!found) print d }
-  ' "$CONFIG"
-}
+HOST="$(get_ini "$CONFIG" server host 127.0.0.1)"
+PORT="$(get_ini "$CONFIG" server port 8080)"
+MODEL="$(get_ini "$CONFIG" model path /home/nox/models/allam-7b-instruct-preview-q4_k_m.gguf)"
+CTX="$(get_ini "$CONFIG" model ctx_size 2048)"
+NGL="$(get_ini "$CONFIG" model gpu_layers 99)"
 
-HOST="$(get_ini server host 127.0.0.1)"
-PORT="$(get_ini server port 8080)"
-MODEL="$(get_ini model path /home/nox/models/allam-7b-instruct-preview-q4_k_m.gguf)"
-CTX="$(get_ini model ctx_size 2048)"
-NGL="$(get_ini model gpu_layers 99)"
-
-LLAMA_SERVER="${LLAMA_SERVER:-llama-server}"
-if ! command -v "$LLAMA_SERVER" >/dev/null 2>&1; then
-  if [[ -x /usr/local/bin/llama-server ]]; then
-    LLAMA_SERVER=/usr/local/bin/llama-server
-  else
-    notify "Translator" "llama-server not found"
-    exit 1
-  fi
+if ! LLAMA_SERVER="$(find_llama_server)"; then
+  notify "Translator" "llama-server not found"
+  exit 1
 fi
 
 GUI="${TRANSLATOR_BIN:-$ROOT/build/translator}"
@@ -129,12 +105,10 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
-# Single-instance: if already running, focus/raise is not available; just refuse.
 if [[ -f "$PIDFILE" ]]; then
   old="$(awk 'NR==1{print; exit}' "$PIDFILE" 2>/dev/null || true)"
   if [[ -n "$old" ]] && kill -0 "$old" 2>/dev/null; then
     notify "Translator" "Already running"
-    # Do not run cleanup stop on this early exit — clear trap
     trap - EXIT INT TERM
     exit 0
   fi
@@ -142,7 +116,6 @@ fi
 
 if server_healthy; then
   echo "Reusing llama-server at http://${HOST}:${PORT} (will stop on GUI close)"
-  STARTED_SERVER=0
   SERVER_PID=""
 else
   echo "Starting llama-server…"
@@ -156,7 +129,6 @@ else
     --jinja \
     >"$LOG" 2>&1 &
   SERVER_PID=$!
-  STARTED_SERVER=1
   echo -n "Waiting for model to load"
   for i in $(seq 1 180); do
     if ! kill -0 "$SERVER_PID" 2>/dev/null; then
@@ -182,10 +154,8 @@ cd "$ROOT"
 export TRANSLATOR_CONFIG="$CONFIG"
 export TRANSLATOR_ROOT="$ROOT"
 
-# Record launcher + GUI pids for debugging
 echo "$$" >"$PIDFILE"
 "$GUI" &
 GUI_PID=$!
 echo "$GUI_PID" >>"$PIDFILE"
 wait "$GUI_PID"
-# GUI exited → cleanup trap stops server

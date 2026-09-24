@@ -35,8 +35,8 @@ bool load_config(const std::string& path, AppConfig& out) {
       if (key == "host") out.host = val;
       else if (key == "port") out.port = std::stoi(val);
     } else if (section == "model") {
-      if (key == "path") out.model_path = val;
-      else if (key == "name") out.model = val;
+      if (key == "name") out.model = val;
+      // path / ctx_size / gpu_layers are used by shell launchers, not the GUI client
     } else if (section == "generation") {
       if (key == "temperature") out.temperature = std::stod(val);
       else if (key == "max_tokens") out.max_tokens = std::stoi(val);
@@ -49,7 +49,6 @@ bool load_config(const std::string& path, AppConfig& out) {
       else if (key == "model") out.model = val;
       else if (key == "temperature") out.temperature = std::stod(val);
       else if (key == "max_tokens") out.max_tokens = std::stoi(val);
-      else if (key == "model_path") out.model_path = val;
       else if (key == "lexicon_path") out.lexicon_path = val;
     }
   }

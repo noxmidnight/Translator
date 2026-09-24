@@ -1,16 +1,13 @@
 #include "lexicon.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdint>
-#include <cstring>
-#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <unordered_set>
 
 namespace {
-
-bool is_utf8_continuation(unsigned char c) { return (c & 0xC0) == 0x80; }
 
 // Decode one UTF-8 codepoint; advances i. Returns 0 on error.
 uint32_t next_cp(const std::string& s, size_t& i) {
@@ -198,6 +195,10 @@ bool Lexicon::load(const std::string& path) {
   en_map_.clear();
   std::ifstream in(path);
   if (!in) return false;
+
+  // MUSE AR–EN is ~31k lines; reserve to cut rehashing.
+  map_.reserve(28000);
+  en_map_.reserve(12000);
 
   std::string line;
   while (std::getline(in, line)) {

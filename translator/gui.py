@@ -36,7 +36,7 @@ class TranslatorApp(tk.Tk):
             max_tokens=self.settings.max_tokens,
         )
         self.lexicon = Lexicon()
-        self.lexicon.load(default_lexicon_path())
+        self.lexicon.load(default_lexicon_path(self.settings.lexicon_path))
         self._busy = False
 
         self.direction = tk.StringVar(value="Arabic → English")

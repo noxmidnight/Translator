@@ -190,9 +190,14 @@ class Lexicon:
         )
 
 
-def default_lexicon_path() -> Path:
+def default_lexicon_path(configured: str | None = None) -> Path:
     env = os.environ.get("TRANSLATOR_LEXICON")
     if env:
         return Path(env)
+    if configured:
+        p = Path(configured)
+        if p.is_absolute():
+            return p
+        return Path(__file__).resolve().parent.parent / p
     root = Path(__file__).resolve().parent.parent
     return root / "data" / "muse_ar_en.txt"

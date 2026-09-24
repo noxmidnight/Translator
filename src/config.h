@@ -8,8 +8,6 @@ struct AppConfig {
   std::string model = "allam-7b-instruct";
   double temperature = 0.3;
   int max_tokens = 768;
-  std::string model_path =
-      "/home/nox/models/allam-7b-instruct-preview-q4_k_m.gguf";
   std::string lexicon_path = "data/muse_ar_en.txt";
   std::string theme_css = "assets/theme.css";
 };

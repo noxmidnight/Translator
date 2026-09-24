@@ -19,18 +19,19 @@ class ChatResult:
 def has_forbidden_script(text: str) -> bool:
     """CJK / Cyrillic / etc. — not Arabic or Latin."""
     for ch in text:
-        o = ord(ch)
-        if 0x4E00 <= o <= 0x9FFF:  # CJK Unified
-            return True
-        if 0x3400 <= o <= 0x4DBF:  # CJK Extension A
-            return True
-        if 0x3040 <= o <= 0x30FF:  # Hiragana / Katakana
-            return True
-        if 0xAC00 <= o <= 0xD7AF:  # Hangul
-            return True
-        if 0x0400 <= o <= 0x04FF:  # Cyrillic
+        if _is_forbidden_cp(ord(ch)):
             return True
     return False
+
+
+def _is_forbidden_cp(o: int) -> bool:
+    return (
+        0x4E00 <= o <= 0x9FFF
+        or 0x3400 <= o <= 0x4DBF
+        or 0x3040 <= o <= 0x30FF
+        or 0xAC00 <= o <= 0xD7AF
+        or 0x0400 <= o <= 0x04FF
+    )
 
 
 def mask_forbidden_script(text: str) -> str:
@@ -38,7 +39,7 @@ def mask_forbidden_script(text: str) -> str:
     out: list[str] = []
     in_bad = False
     for ch in text:
-        if has_forbidden_script(ch):
+        if _is_forbidden_cp(ord(ch)):
             if not in_bad:
                 out.append(" ___ ")
                 in_bad = True
